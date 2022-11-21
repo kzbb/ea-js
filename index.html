@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>gbjs</title>
+<!-- ファイル１つに収めたいので、スタイルもJavaScriptも、この中に書きます -->
+  <style>
+    body {
+      color: #202020;
+    }
+
+    header{
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      text-align: center;
+      font-size: medium;
+      background: #ffffff;
+    }
+
+    footer{
+      padding-bottom: 1rem;
+      text-align: center;
+      color: #bababa;
+      font-size: small;
+      background: #ffffff;
+    }
+
+    .menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20vw;
+      height: 100vh;
+      overflow-y: scroll;
+      border-right: #bababa;
+      border-right-style: solid;
+      border-right-width: thin;
+    }
+
+    .menu ul {
+      list-style-type: none;
+      margin-bottom: 2rem;
+    }
+    .menu li {
+      overflow-wrap: break-word;
+      text-indent: -1rem;
+      padding-bottom: 0.5rem;
+    }
+    .menu li:hover {
+      color: #6666ee;
+    }
+
+    main{
+      display: block;
+      margin-left: 20vw;
+      padding-left: 2rem;
+    }
+    main img{
+        display: block;
+    }
+
+    /*main div{*/
+    /*    margin-left: 1rem;*/
+    /*}*/
+
+    /*ID*/
+    .data_0{
+      font-size: small;
+    }
+
+    /*タイトル*/
+    .data_1{
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    /*画像*/
+    .data_2{
+      margin-bottom: 1rem;
+    }
+
+  </style>
+</head>
+<body>
+<!--ここにはウェブサイトの骨組みが書かれています-->
+<!--この骨組みの中身をJavaScriptで書き換えて、データを表示する仕組みです-->
+
+<!--ここはメニューです-->
+<div class="menu">
+
+<!--ここはヘッダーです-->
+  <header id="header"></header>
+
+<!--ここはデータのリストです-->
+  <nav>
+    <ul id="list"></ul>
+  </nav>
+
+<!--ここはフッターです-->
+  <footer id="footer">gbjs 22.11.20</footer>
+
+</div>
+
+<!--ここは個別のデータを表示するメインの領域です-->
+  <main>
+    <div id="data_viewer"></div>
+  </main>
+
+<!--ここから下に書かれているのがJavaScriptです-->
+<!--データのファイルを読み込んで、ウェブサイトとして表示する機能です-->
+<script>
+  // メニューとメインの要素をそれぞれ取得して変数に収めます
+  const list = document.getElementById("list");
+  const data_viewer = document.getElementById("data_viewer");
+
+  // 表示するデータの所在です
+  const tsv_path = "data.tsv";
+  // ヘッダーにファイル名を表示
+  document.getElementById("header").innerHTML = "Loaded File: " + tsv_path;
+
+  // 処理するために必要な、空の配列を用意しておきます
+  let data_array = [];
+
+  // 処理を実行します。どのような処理をするかは、この下に書いてあります
+  import_tsv(tsv_path);
+
+  //　ここから下に具体的な処理の内容を書きます
+
+  function import_tsv(tsv_path) {
+    //　指定されたファイルを読み込みます
+    fetch(tsv_path)
+            .then((res)=> {
+              //もしレスポンスがだめなら、コンソールにエラーメッセージを出力
+              if (!res.ok) {
+                console.log('正常にリクエストを処理できませんでした。');
+              }
+              //レスポンスOKなら、テキストデータを返す
+              return res.text();
+            })
+            .then((tsv_data)=>{
+              // 配列に変換します。どのように処理をするかは、別に書きます
+              let data_array = convert_array(tsv_data);
+
+              // 配列をメニューとして表示します。どのようにするかは別に書きます
+              make_menu(data_array);
+            })
+            // エラーが起きた場合、コンソールにお知らせします
+            .catch((error)=>{
+              console.log("ERROR!");
+            });
+  }
+
+  // これがファイルを配列に変換する処理です
+  //　テキストデータを多次元配列にします
+  function convert_array(tsv_data){
+    // まず、行末（改行マーク）を区切りとして分割します
+    const data_string = tsv_data.split('\n');
+
+    //　分割した1行ずつ、処理をします
+    for (let i = 0; i < data_string.length; i++){
+      //　タブ区切りで分割して、子配列におさめます
+      data_array[i] = data_string[i].split('\t');
+    }
+    //　出来上がった多次元配列を返します
+    return data_array;
+  }
+
+  //　これがメニュー表示を作成する処理です
+  //　多次元配列の指定の部分だけを取り出してHTMLに加筆します
+  function make_menu(data_array) {
+    //　配列の要素それぞれについて、子配列の中身を見ていきます
+    data_array.forEach((elements, line) => {
+
+      // 最初の行はタイトル行として読み飛ばす
+      if (line != 0) {
+        //　メニューをクリックして個別のデータを表示するスクリプトに対して
+        //　何番目（何行目）なのかを引数にすることにします
+        let fnc = "select_dat(" + line + ")";
+
+        //　メニューのリスト要素を新たに１つ作成します
+        let newElm = document.createElement("li");
+        //　新たに作成した要素に対して、スクリプトを割り当てます
+        newElm.setAttribute("onclick", fnc);
+
+        //　子配列の最初の要素をIDとします
+        let id = elements[0];
+        //　子配列の２番めの要素をタイトルとします
+        let title = elements[1];
+        //　新たに作成したリストの文字列としてIDとタイトルを記入します
+        newElm.innerHTML = id + "　" + title;
+
+        //　新たに作成した要素を、メニューに追加します
+        list.appendChild(newElm);
+      }
+    });
+  }
+
+  //　これが個別のデータを表示する処理です
+  function select_dat(line){
+    // 表示領域を初期化
+    data_viewer.innerHTML="";
+
+    //　行を指定して、要素を取り出す
+    data_array[line].forEach((element, index)=>{
+      //　div要素を新しく作成
+      let newElm = document.createElement("div");
+
+      //　作成したdivにクラスを追加
+      newElm.classList.add("data_"+index);
+      //　作成したdiv要素に、配列の要素を記入
+      newElm.innerHTML = element;
+
+      //　作成したdiv要素を、表示領域に追加
+      data_viewer.appendChild(newElm);
+    })
+  }
+
+</script>
+
+</body>
+</html>
