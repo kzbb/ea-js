@@ -97,7 +97,7 @@
   </nav>
 
 <!--ここはフッターです-->
-  <footer id="footer">gbjs 22.11.20</footer>
+  <footer id="footer">ea-js 23.02.19</footer>
 
 </div>
 
@@ -109,14 +109,14 @@
 <!--ここから下に書かれているのがJavaScriptです-->
 <!--データのファイルを読み込んで、ウェブサイトとして表示する機能です-->
 <script>
-  // メニューとメインの要素をそれぞれ取得して変数に収めます
-  const list = document.getElementById("list");
-  const data_viewer = document.getElementById("data_viewer");
-
   // 表示するデータの所在です
   const tsv_path = "data.tsv";
   // ヘッダーにファイル名を表示
   document.getElementById("header").innerHTML = "Loaded File: " + tsv_path;
+
+  // メニューとメインの要素をそれぞれ取得して変数に収めます
+  const list = document.getElementById("list");
+  const data_viewer = document.getElementById("data_viewer");
 
   // 処理するために必要な、空の配列を用意しておきます
   let data_array = [];
