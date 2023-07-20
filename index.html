@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>ea-js</title>
-<!-- ファイル１つに収めたいので、スタイルもJavaScriptも、この中に書きます -->
+  <meta charset="UTF-8">
+  <title>ea-js</title>
+  <!-- ファイル１つに収めたいので、スタイルもJavaScriptも、この中に書きます -->
   <style>
     body {
       color: #202020;
@@ -56,27 +56,16 @@
       padding-left: 2rem;
     }
     main img{
-        display: block;
+      display: block;
     }
 
-    /*main div{*/
-    /*    margin-left: 1rem;*/
-    /*}*/
-
-    /*ID*/
-    .data_0{
-      font-size: small;
+    table{
+      border-spacing: 2rem 2rem;
     }
 
-    /*タイトル*/
-    .data_1{
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    /*画像*/
-    .data_2{
-      margin-bottom: 1rem;
+    table th{
+      vertical-align: top;
+      text-align: right;
     }
 
   </style>
@@ -88,23 +77,23 @@
 <!--ここはメニューです-->
 <div class="menu">
 
-<!--ここはヘッダーです-->
+  <!--ここはヘッダーです-->
   <header id="header"></header>
 
-<!--ここはデータのリストです-->
+  <!--ここはデータのリストです-->
   <nav>
     <ul id="list"></ul>
   </nav>
 
-<!--ここはフッターです-->
-  <footer id="footer">ea-js 23.02.19</footer>
+  <!--ここはフッターです-->
+  <footer id="footer">ea-js 23.07.20</footer>
 
 </div>
 
 <!--ここは個別のデータを表示するメインの領域です-->
-  <main>
-    <div id="data_viewer"></div>
-  </main>
+<main>
+  <div id="data_viewer"></div>
+</main>
 
 <!--ここから下に書かれているのがJavaScriptです-->
 <!--データのファイルを読み込んで、ウェブサイトとして表示する機能です-->
@@ -200,19 +189,34 @@
     // 表示領域を初期化
     data_viewer.innerHTML="";
 
+    // 新たにテーブルを作成
+    let newTable = document.createElement("table");
+
     //　行を指定して、要素を取り出す
     data_array[line].forEach((element, index)=>{
-      //　div要素を新しく作成
-      let newElm = document.createElement("div");
 
-      //　作成したdivにクラスを追加
-      newElm.classList.add("data_"+index);
-      //　作成したdiv要素に、配列の要素を記入
-      newElm.innerHTML = element;
+      // テーブルの行を作成
+      let newTr = document.createElement("tr");
+      // テーブルの「見出し」を作成
+      let newTh = document.createElement("th");
+      // テーブルの「中身」を作成
+      let newTd = document.createElement("td");
 
-      //　作成したdiv要素を、表示領域に追加
-      data_viewer.appendChild(newElm);
+      // tsvファイルの先頭行を「見出し」にする
+      newTh.innerHTML=data_array[0][index];
+      // forEachでとりだした要素を「中身」に入れる
+      newTd.innerHTML=element;
+
+      // 「見出し」を行に追加
+      newTr.appendChild(newTh);
+      // 「中身」をを行に追加
+      newTr.appendChild(newTd);
+      // 行をテーブルに追加
+      newTable.appendChild(newTr);
+
     })
+    // テーブルを表示領域に追加
+    data_viewer.appendChild(newTable);
   }
 
 </script>
